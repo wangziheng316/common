@@ -1,1 +1,3 @@
 baseurl: /home
+auto: true
+server: true
