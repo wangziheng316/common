@@ -31,6 +31,18 @@
         //画地图
         drawMap: function () {
             var tds = [];
+            if (window.ActiveXObject && parseInt(navigator.userAgent.match(/msie ([\d.]+)/i)[1]) < 8) {
+                var css = '#FLM_main table td{background-color:#888;}',
+                    head = this.doc.getElementsByTagName("head")[0],
+                    style = this.doc.createElement("style");
+                style.type = "text/css";
+                if (style.styleSheet) {
+                    style.styleSheet.cssText = css;
+                } else {
+                    style.appendChild(this.doc.createTextNode(css));
+                }
+                head.appendChild(style);
+            }
             for (var i = 0; i < this.rowCount; i++) {
                 tds.push("<tr>");
                 for (var j = 0; j < this.colCount; j++) {
@@ -38,7 +50,7 @@
                 }
                 tds.push("</td>");
             }
-            this.table.innerHTML = tds.join("");
+            this.setTableInnerHTML(this.table, tds.join(""));
         },
         //初始化，一是设置数组默认值为0，二是确定地雷个数
         init: function () {
@@ -255,6 +267,21 @@
             var iChoices = iLastValue - iFirstValue + 1;
             return Math.floor(Math.random() * iChoices + iFirstValue);
         },
+        //添加HTML到Table
+        setTableInnerHTML: function (table, html) {
+            if (navigator && navigator.userAgent.match(/msie/i)) {
+                var temp = table.ownerDocument.createElement('div');
+                temp.innerHTML = '<table><tbody>' + html + '</tbody></table>';
+                if (table.tBodies.length == 0) {
+                    var tbody = document.createElement("tbody");
+                    table.appendChild(tbody);
+                }
+                table.replaceChild(temp.firstChild.firstChild, table.tBodies[0]);
+            } else {
+                table.innerHTML = html;
+            }
+        },
+        //模拟鼠标事件
         eventFire: function (el, etype) {
             if (el.fireEvent) {
                 (el.fireEvent('on' + etype));
